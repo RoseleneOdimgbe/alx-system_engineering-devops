@@ -1,2 +1,5 @@
 #!/usr/bin/env bash
-ssh -i ~/.ssh/school ubuntu@54.90.30.88
+# This script is used to demonstrate how to use a 
+# private key to authenticate to a remote server
+
+ssh -i ~/.ssh/school ubuntu@54.165.237.116
