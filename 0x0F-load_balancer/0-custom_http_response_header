@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
+# This script configures a brand new Ubuntu server to run a simple web server
+# (nginx) and return a custom HTTP response header `X-Served-By` which bears
+# the name of the server that responded to the request.
 
-# Script that configures Nginx server with a custom header
-apt-get -y update
-apt-get -y install nginx
+if [ "$EUID" -ne 0 ]; then
+  echo "You need to be root to run this script."
+  exit 1
+fi
 
-echo "ALX School" > /var/www/html/index.nginx-debian.html
-echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
-sed -i "s/server_name _;/server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/RoseleneOdimgbe permanent;\n\n\terror_page 404 \/custom_404.html;\n\tlocation = \/custom_404.html {\n\t\troot \/usr\/share\/nginx\/html;\n\t\tinternal;\n\t}/" /etc/nginx/sites-available/default
-sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
-service nginx start
+# Update packages
+apt update
+
+# Install nginx
+apt install -y nginx
+
+# Create a custom HTTP response header
+echo "add_header X-Served-By $HOSTNAME;" > /etc/nginx/conf.d/custom_response_headers.conf
+
+# Restart nginx
+service nginx restart
